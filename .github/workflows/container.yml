@@ -62,8 +62,10 @@ jobs:
           set -euo pipefail
           IMG="${IMAGE}:${TAG}"
           docker run --rm "$IMG" ps --version
-          docker run --rm "$IMG" SigProfilerMatrixGenerator --help | head -n 3
-          docker run --rm "$IMG" SigProfilerAssignment cosmic_fit --help | head -n 3
+          docker run --rm "$IMG" SigProfilerMatrixGenerator matrix_generator --help > spmg_help.txt
+          head -n 3 spmg_help.txt
+          docker run --rm "$IMG" SigProfilerAssignment cosmic_fit --help > spa_help.txt
+          head -n 3 spa_help.txt
           docker run --rm "$IMG" python - <<'PY'
           import importlib.metadata as md, os
           from SigProfilerMatrixGenerator.scripts import reference_genome_manager as rgm
@@ -115,8 +117,8 @@ jobs:
         run: |
           set -euo pipefail
           apptainer build sigprofiler.sif "docker://${IMAGE}:${TAG}"
-          apptainer exec sigprofiler.sif SigProfilerMatrixGenerator --help | head -n 3
-          apptainer exec sigprofiler.sif SigProfilerAssignment cosmic_fit --help | head -n 3
+          apptainer exec sigprofiler.sif SigProfilerMatrixGenerator matrix_generator --help > /dev/null
+          apptainer exec sigprofiler.sif SigProfilerAssignment cosmic_fit --help > /dev/null
           ls -lh sigprofiler.sif
 
       - name: Push SIF to GHCR via ORAS
