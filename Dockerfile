@@ -33,8 +33,12 @@ RUN apt-get update \
 
 # pandas<3: SigProfilerAssignment 1.1.5's sample-reconstruction plots still use
 # pandas 2 semantics (int() on a single-row Series).
+# SETUPTOOLS_SCM_PRETEND_VERSION_FOR_...: pip's shallow git checkout carries no tags,
+# so setuptools_scm would report 1.dev<N>+unknown and break SigProfilerAssignment's
+# SigProfilerMatrixGenerator>=1.3.0 requirement.
 RUN pip install --no-cache-dir --upgrade pip "setuptools>=69" wheel \
-    && pip install --no-cache-dir "pandas>=2.2,<3" \
+    && SETUPTOOLS_SCM_PRETEND_VERSION_FOR_SIGPROFILERMATRIXGENERATOR="${SPMG_VERSION}" \
+       pip install --no-cache-dir "pandas>=2.2,<3" \
          "git+https://github.com/ljwharbers/SigProfilerMatrixGenerator.git@${SPMG_COMMIT}" \
          "git+https://github.com/ljwharbers/SigProfilerAssignment.git@${SPA_COMMIT}" \
     && apt-get purge -y git && apt-get autoremove -y
